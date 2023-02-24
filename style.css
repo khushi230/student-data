@@ -13,6 +13,11 @@ body {
 h1 {
   margin-left: 25%;
 }
+
+.error {
+  border: 1px solid red;
+}
+
 .backdrop {
   position: fixed;
   width: 100%;
@@ -55,7 +60,6 @@ h1 {
   padding-top: 2rem;
   width: 60%;
   margin: auto;
-  display: none;
 }
 .table-container.visible {
   display: flex;
