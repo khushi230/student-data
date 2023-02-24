@@ -1,128 +1,102 @@
 const modal = document.getElementById("modal");
-const addModal = document.querySelector(".header button");
+const toggleModalButton = document.querySelector(".header button");
 const backdrop = document.querySelector(".backdrop");
-const name = document.getElementById("name");
-const rollNo = document.getElementById("roll-number");
-const stClass = document.getElementById("class");
-const admNo = document.getElementById("adm-number");
-const dob = document.getElementById("dob");
-const save = modal.querySelector("button");
+const nameInput = document.getElementById("name");
+const rollNoInput = document.getElementById("roll-number");
+const ClassInput = document.getElementById("class");
+const admNoInput = document.getElementById("adm-number");
+const dobInput = document.getElementById("dob");
+const saveButton = document.getElementById("save");
 const tableContainer = document.querySelector(".table-container");
 const tableBody = document.querySelector(".blueTable tbody");
-const update = document.getElementById("update");
+const updateButton = document.getElementById("update");
 let students = [];
-
-const deleteHandler = (admNo) => {
-  let index = 0;
-  for (const student of students) {
-    if (student.admNo === admNo) {
-      break;
-    }
-    index++;
-  }
-  tableBody.children[index].remove();
-  students.splice(index, 1);
-  console.log(students);
+const clearForm = () => {
+  nameInput.value = "";
+  ClassInput.value = "";
+  rollNoInput.value = "";
+  admNoInput.value = "";
+  dobInput.value = "";
 };
 
-const editHandler = (admissionNo) => {
-  let index = 0;
-  for (const student of students) {
-    if (student.admNo === admissionNo) {
-      break;
-    }
-    index++;
-  }
-  update.classList.toggle("visible");
-  backdrop.classList.toggle("visible");
+let editedNode = {};
+
+const toggleModalClickHandler = () => {
   modal.classList.toggle("visible");
-  name.value = students[index].name;
-  stClass.value = students[index].stclass;
-  admNo.value = students[index].admNo;
-  rollNo.value = students[index].rollNo;
-  dob.value = students[index].dob;
-  admNo.setAttribute("disabled", "true");
+  backdrop.classList.toggle("visible");
+  saveButton.classList.add("visible");
+  updateButton.classList.remove("visible");
+  clearForm();
 };
 
-const renderRows = (studentObject) => {
-  const tableRow = document.createElement("tr");
-  tableRow.innerHTML = `
-          <td>${studentObject.name}</td>
-          <td>${studentObject.stclass}</td>
-          <td>${studentObject.rollNo}</td>
-          <td>${studentObject.admNo}</td>
-          <td>${studentObject.dob}</td>
-         <td><button id="${studentObject.admNo}-edit" >edit</button><button id="${studentObject.admNo}-delete">deletet</button></td>
-          `;
+const backdropClickHandler = () => {
+  toggleModalClickHandler();
+};
+
+const renderTable = () => {
   tableContainer.classList.add("visible");
-  tableBody.append(tableRow);
-  students.push(studentObject);
-  const btn = document.getElementById(studentObject.admNo + "-delete");
-  btn.addEventListener("click", () => {
-    deleteHandler(studentObject.admNo);
-  });
-  const editBtn = document.getElementById(studentObject.admNo + "-edit");
-  editBtn.addEventListener("click", () => {
-    editHandler(studentObject.admNo);
-  });
 };
 
-const addModalHandler = () => {
-  save.classList.toggle("visible");
-  backdrop.classList.toggle("visible");
-  modal.classList.toggle("visible");
+const renderRows = (studentData) => {
+  const tableRow = document.createElement("tr");
+  tableRow.innerHTML = `<td>${studentData.name}</td>
+  <td>${studentData.class}</td>
+  <td>${studentData.rollNumber}</td>
+  <td>${studentData.admNo}</td>
+  <td>${studentData.dob}</td>
+ <td><button onClick="EditClickHandler(this)">edit</button><button onClick="deleteClickHandler(this)">delete</button></td>
+  `;
+  tableBody.appendChild(tableRow);
 };
 
 const saveClickHandler = () => {
-  const studentObject = {
-    name: name.value,
-    stClass: stClass.value,
-    rollNo: rollNo.value,
-    admNo: admNo.value,
+  const studentData = {
+    name: nameInput.value,
+    class: ClassInput.value,
+    rollNumber: rollNoInput.value,
+    admNo: admNoInput.value,
+    dob: dobInput.value,
   };
-
-  renderRows(studentObject);
-
-  addModalHandler();
+  modal.classList.toggle("visible");
+  backdrop.classList.toggle("visible");
+  renderTable();
+  renderRows(studentData);
+  students.push(studentData);
 };
 
-const updateClickHandler = () => {
-  let index = 0;
-  for (const student of students) {
-    if (student.admNo === admNo.value) {
-      break;
-    }
-    index++;
-  }
+const EditClickHandler = (currData) => {
+  modal.classList.toggle("visible");
+  backdrop.classList.toggle("visible");
+  saveButton.classList.remove("visible");
+  updateButton.classList.add("visible");
+  nameInput.value =
+    currData.parentElement.parentElement.children[0].textContent;
+  ClassInput.value =
+    currData.parentElement.parentElement.children[1].textContent;
+  rollNoInput.value =
+    currData.parentElement.parentElement.children[2].textContent;
+  admNoInput.value =
+    currData.parentElement.parentElement.children[3].textContent;
+  dobInput.value = currData.parentElement.parentElement.children[4].textContent;
 
-  const studentObject = {
-    name: name.value,
-    stClass: stClass.value,
-    rollNo: rollNo.value,
-    admNo: admNo.value,
-  };
-
-  students[index] = studentObject;
-
-  tableBody.children[index].innerHTML = `
-          <td>${students[index].name}</td>
-          <td>${students[index].stclass}</td>
-          <td>${students[index].rollNo}</td>
-          <td>${students[index].admNo}</td>
-          <td>${students[index].dob}</td>
-         <td><button id="${students[index].admNo}-edit" >edit</button><button id="${students[index].admNo}-delete">deletet</button></td>
-          `;
-  const btn = document.getElementById(students[index].admNo + "-delete");
-  btn.addEventListener("click", () => {
-    deleteHandler(students[index].admNo);
-  });
-  const editBtn = document.getElementById(students[index].admNo + "-edit");
-  editBtn.addEventListener("click", () => {
-    editHandler(students[index].admNo);
-  });
-
-  addModalHandler();
+  editedNode = currData.parentElement.parentElement;
 };
-addModal.addEventListener("click", addModalHandler);
-save.addEventListener("click", saveClickHandler);
-update.addEventListener("click", updateClickHandler);
+const deleteClickHandler = (currRow) => {
+  currRow.parentElement.parentElement.remove();
+};
+
+const updateClickHandler = (e) => {
+  editedNode.children[0].textContent = nameInput.value;
+  editedNode.children[1].textContent = ClassInput.value;
+  editedNode.children[2].textContent = rollNoInput.value;
+  editedNode.children[3].textContent = admNoInput.value;
+  editedNode.children[4].textContent = dobInput.value;
+
+  modal.classList.toggle("visible");
+  backdrop.classList.toggle("visible");
+};
+
+toggleModalButton.addEventListener("click", toggleModalClickHandler);
+backdrop.addEventListener("click", backdropClickHandler);
+saveButton.addEventListener("click", saveClickHandler);
+updateButton.addEventListener("click", updateClickHandler);

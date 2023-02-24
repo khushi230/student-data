@@ -209,10 +209,10 @@ button {
 .button:active {
   background: #144e75;
 }
-.update {
+button.update {
   display: none;
 }
-.save {
+button.save {
   display: none;
 }
 button.visible {
